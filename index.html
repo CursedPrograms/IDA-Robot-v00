@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IDA — Integrated Drive Automaton</title>
+<meta name="description" content="IDA is a small Arduino tank robot driven entirely by IR remote, with ultrasonic obstacle avoidance, WASD and tank drive modes and a collision guard.">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="IDA — Integrated Drive Automaton">
+<meta property="og:description" content="A small IR-remote Arduino tank robot with ultrasonic obstacle avoidance.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="images/ida-robot-front.png">
+<style>
+  :root {
+    --bg: #0d0b09;
+    --panel: #17140f;
+    --border: #2a241b;
+    --accent: #ffb547;
+    --accent2: #ff6b4a;
+    --green: #9be36b;
+    --text: #f0e9df;
+    --sub: #ab9f8e;
+    --mono: ui-monospace, "Cascadia Code", Consolas, "SF Mono", Menlo, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.65 var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  code, pre, .mono { font-family: var(--mono); }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+  /* nav */
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(13, 11, 9, .85);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 56px; gap: 16px; }
+  nav .brand { font: 700 18px var(--mono); letter-spacing: 3px; color: var(--accent); }
+  nav ul { display: flex; gap: 20px; list-style: none; margin: 0; padding: 0; font-size: 14px; }
+  nav ul a { color: var(--sub); }
+  nav ul a:hover { color: var(--text); text-decoration: none; }
+  @media (max-width: 640px) { nav ul li:not(:last-child) { display: none; } }
+
+  /* hero */
+  header.hero { padding: 88px 0 56px; text-align: center; position: relative; overflow: hidden; }
+  header.hero::before {
+    content: ""; position: absolute; inset: -40% 0 auto 0; height: 520px; z-index: -1;
+    background: radial-gradient(ellipse at 50% 30%, rgba(255, 181, 71, .15), transparent 60%),
+                radial-gradient(ellipse at 75% 20%, rgba(255, 107, 74, .12), transparent 55%);
+  }
+  .eyebrow { font: 12px var(--mono); letter-spacing: 3px; color: var(--sub); text-transform: uppercase; }
+  h1 {
+    margin: 12px 0 8px;
+    font: 800 clamp(56px, 12vw, 108px)/1 var(--mono);
+    letter-spacing: .12em;
+    color: var(--accent);
+    text-shadow: 0 0 40px rgba(255, 181, 71, .3);
+  }
+  .tagline { font-size: clamp(15px, 2.6vw, 20px); color: var(--text); letter-spacing: .28em; text-transform: uppercase; margin: 0 0 28px; }
+  .lede { max-width: 640px; margin: 0 auto 32px; color: var(--sub); font-size: 17px; }
+  .cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .btn {
+    display: inline-block; padding: 11px 22px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--panel); color: var(--text);
+    font: 600 14px var(--mono); letter-spacing: .05em; transition: border-color .15s, background .15s;
+  }
+  .btn:hover { border-color: var(--accent); text-decoration: none; }
+  .btn.primary { background: rgba(255, 181, 71, .12); border-color: var(--accent); color: var(--accent); }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 36px; }
+  .tag { font: 12px var(--mono); color: var(--sub); border: 1px solid var(--border); padding: 3px 10px; border-radius: 999px; }
+
+  /* photos */
+  .photos { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 48px; }
+  .photos figure { margin: 0; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .photos img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; }
+  .photos figcaption { font: 12px var(--mono); letter-spacing: .15em; text-transform: uppercase; color: var(--sub); padding: 10px 14px; }
+
+  /* sections */
+  section { padding: 56px 0; border-top: 1px solid var(--border); }
+  h2 { margin: 0 0 6px; font: 700 13px var(--mono); letter-spacing: .3em; text-transform: uppercase; color: var(--accent); }
+  h3.title { margin: 0 0 24px; font-size: clamp(24px, 4vw, 32px); line-height: 1.25; }
+  h3.sub { margin: 40px 0 16px; font-size: 22px; line-height: 1.25; }
+  p { margin: 0 0 16px; }
+  .muted { color: var(--sub); }
+
+  .grid { display: grid; gap: 14px; }
+  .grid.cols-3 { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .grid.cols-2 { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+  .card h4 { margin: 0 0 6px; font-size: 16px; }
+  .card p { margin: 0; color: var(--sub); font-size: 14.5px; }
+  .card .k { font: 11px var(--mono); letter-spacing: .15em; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; display: block; }
+
+  /* hardware list */
+  .parts { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .parts li {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 16px; display: flex; align-items: baseline; gap: 12px;
+  }
+  .parts .n { font: 12px var(--mono); color: var(--accent); min-width: 22px; }
+
+  /* modes */
+  .mode { border-left: 3px solid var(--accent); }
+  .mode:nth-child(2) { border-left-color: var(--accent2); }
+  .mode:nth-child(3) { border-left-color: var(--green); }
+  kbd {
+    font: 12px var(--mono); background: var(--bg); border: 1px solid var(--border);
+    border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; color: var(--text);
+  }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
+
+  /* code */
+  pre {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px 18px; overflow-x: auto; font-size: 13.5px; line-height: 1.6; margin: 0 0 16px;
+  }
+  pre .c { color: #6f6553; }
+  :not(pre) > code { background: var(--panel); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: .9em; }
+
+  /* steps */
+  ol.steps { margin: 0 0 16px; padding-left: 22px; }
+  ol.steps li { margin-bottom: 10px; }
+  ol.steps li::marker { color: var(--accent); font-family: var(--mono); }
+
+  /* callout */
+  .note { background: rgba(255, 181, 71, .07); border: 1px solid rgba(255, 181, 71, .35); border-radius: 10px; padding: 14px 18px; margin: 16px 0 0; font-size: 14.5px; }
+  .note strong { color: var(--accent); }
+
+  /* table */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+  th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--border); }
+  th { font: 11px var(--mono); letter-spacing: .15em; text-transform: uppercase; color: var(--sub); background: var(--panel); white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  td.mono { color: var(--accent); font-size: 13px; white-space: nowrap; }
+
+  /* related */
+  .related { display: flex; flex-wrap: wrap; gap: 10px; }
+  .related a { font: 13px var(--mono); border: 1px solid var(--border); background: var(--panel); border-radius: 8px; padding: 8px 14px; color: var(--text); }
+  .related a:hover { border-color: var(--accent); text-decoration: none; }
+
+  /* footer */
+  footer { border-top: 1px solid var(--border); padding: 48px 0 56px; text-align: center; color: var(--sub); font-size: 14px; }
+  footer .logos { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 28px; margin: 24px 0; }
+  footer .logos img { display: block; height: auto; max-width: 100%; }
+  footer .links { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: center; margin-bottom: 8px; }
+
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn { transition: none; } }
+</style>
+</head>
+<body>
+
+<nav aria-label="Primary">
+  <div class="wrap">
+    <a class="brand" href="#top">IDA</a>
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#hardware">Hardware</a></li>
+      <li><a href="#controls">Controls</a></li>
+      <li><a href="#quickstart">Quick start</a></li>
+      <li><a href="https://github.com/CursedPrograms/IDA-Robot-v00">GitHub</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="eyebrow">A DREAM Robotics Agent</div>
+    <h1>IDA</h1>
+    <p class="tagline">Integrated Drive Automaton</p>
+    <p class="lede">MILA's little sibling: the same tank chassis cut down to a plain Arduino, an ultrasonic sensor on a servo, an IR receiver and an L298N. No WiFi, no Bluetooth. Everything is driven from an IR remote.</p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/CursedPrograms/IDA-Robot-v00">View on GitHub</a>
+      <a class="btn" href="#quickstart">Quick start</a>
+      <a class="btn" href="https://ko-fi.com/cursedentertainment">Support on Ko-fi</a>
+    </div>
+    <div class="tags" aria-label="Technologies">
+      <span class="tag">C++</span>
+      <span class="tag">Arduino</span>
+      <span class="tag">IR remote</span>
+      <span class="tag">Tank</span>
+      <span class="tag">MIT License</span>
+    </div>
+
+    <div class="photos">
+      <figure>
+        <img src="images/ida-robot-front.png" alt="IDA from the front: wooden tank chassis with an HC-SR04 ultrasonic sensor on a servo" width="800" height="800">
+        <figcaption>Front</figcaption>
+      </figure>
+      <figure>
+        <img src="images/ida-robot-top.png" alt="IDA from above: Arduino Uno, 2S 18650 battery pack and the ultrasonic sensor" width="800" height="800" loading="lazy">
+        <figcaption>Top</figcaption>
+      </figure>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section id="overview">
+  <div class="wrap">
+    <h2>Overview</h2>
+    <h3 class="title">Small, simple, and remote-controlled</h3>
+    <div class="grid cols-3">
+      <div class="card">
+        <span class="k">Drive</span>
+        <h4>Three modes</h4>
+        <p>Let her roam on her own in obstacle mode (the default at boot), drive her like a car, or control each track like a tank.</p>
+      </div>
+      <div class="card">
+        <span class="k">Avoid</span>
+        <h4>Diagonal scanning</h4>
+        <p>While driving, the sensor sweeps ahead and to both diagonals, so walls met at an angle are caught before a track corner hits them.</p>
+      </div>
+      <div class="card">
+        <span class="k">Turn</span>
+        <h4>Variable turns</h4>
+        <p>She backs up, looks left and right, and turns towards the open side: 45–90° into open space, up to a full 180° when boxed in.</p>
+      </div>
+      <div class="card">
+        <span class="k">Stay safe</span>
+        <h4>Collision guard</h4>
+        <p>In manual modes she force-stops if something gets within 15&nbsp;cm while driving forward, and WASD stops as soon as you let go.</p>
+      </div>
+      <div class="card">
+        <span class="k">Speed</span>
+        <h4>Four presets</h4>
+        <p>Cycle 100 / 75 / 50 / 25&nbsp;% with the remote's <kbd>OK</kbd> button.</p>
+      </div>
+      <div class="card">
+        <span class="k">Feedback</span>
+        <h4>Buzzer &amp; serial</h4>
+        <p>A beep at power-up and when she stops for an obstacle. Distances, turns, modes and IR codes are printed at 115200 baud.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="hardware">
+  <div class="wrap">
+    <h2>Hardware</h2>
+    <h3 class="title">What she's built from</h3>
+    <ol class="parts">
+      <li><span class="n">01</span> Small wooden tank robot chassis</li>
+      <li><span class="n">02</span> Arduino Uno (or Nano)</li>
+      <li><span class="n">03</span> 2S 18650 battery pack</li>
+      <li><span class="n">04</span> L298N motor driver</li>
+      <li><span class="n">05</span> MG95 servo</li>
+      <li><span class="n">06</span> HC-SR04 ultrasonic sensor</li>
+      <li><span class="n">07</span> 5&nbsp;V DC motors</li>
+      <li><span class="n">08</span> IR receiver + IR remote</li>
+      <li><span class="n">09</span> Buzzer</li>
+    </ol>
+
+    <h3 class="sub">Pinout</h3>
+    <div class="grid cols-2">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Sensors, servo &amp; buzzer</th><th>Pin</th></tr></thead>
+          <tbody>
+            <tr><td>Ultrasonic TRIG</td><td class="mono">8</td></tr>
+            <tr><td>Ultrasonic ECHO</td><td class="mono">9</td></tr>
+            <tr><td>Servo</td><td class="mono">10</td></tr>
+            <tr><td>IR receiver</td><td class="mono">11</td></tr>
+            <tr><td>Buzzer</td><td class="mono">A0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>L298N</th><th>Pin</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>ENA</td><td class="mono">5 (PWM)</td><td class="muted">Right speed</td></tr>
+            <tr><td>IN1 / IN2</td><td class="mono">2 / 3</td><td class="muted">Right motor</td></tr>
+            <tr><td>ENB</td><td class="mono">6 (PWM)</td><td class="muted">Left speed</td></tr>
+            <tr><td>IN3 / IN4</td><td class="mono">4 / 7</td><td class="muted">Left motor</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="note"><strong>Remove the ENA / ENB jumpers</strong> on the L298N, otherwise the speed setting does nothing. Pins 5 and 6 are the only PWM pins left free: the Servo library uses Timer1 (pins 9/10) and IRremote uses Timer2 (pins 3/11).</p>
+  </div>
+</section>
+
+<section id="controls">
+  <div class="wrap">
+    <h2>Controls</h2>
+    <h3 class="title">Everything from the IR remote</h3>
+    <div class="grid cols-3">
+      <div class="card mode">
+        <span class="k"><kbd>1</kbd> &middot; Obstacle</span>
+        <h4>Autonomous</h4>
+        <p>She drives herself, scanning ahead and to the diagonals and turning away from whatever is in the way. This is the mode she boots into.</p>
+      </div>
+      <div class="card mode">
+        <span class="k"><kbd>2</kbd> &middot; WASD</span>
+        <h4>Car-style driving</h4>
+        <p>Hold an arrow to drive forward, back, left or right. Let go and she stops.</p>
+      </div>
+      <div class="card mode">
+        <span class="k"><kbd>3</kbd> &middot; Tank</span>
+        <h4>Independent tracks</h4>
+        <p>Each colour button switches one track on or off. Press it again to switch that track off.</p>
+      </div>
+    </div>
+
+    <h3 class="sub">Tank mode buttons</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Button</th><th>Track</th></tr></thead>
+        <tbody>
+          <tr><td><span class="dot" style="background:#e5484d"></span>Red</td><td>Left forward</td></tr>
+          <tr><td><span class="dot" style="background:#46a758"></span>Green</td><td>Left backward</td></tr>
+          <tr><td><span class="dot" style="background:#f5d90a"></span>Yellow</td><td>Right forward</td></tr>
+          <tr><td><span class="dot" style="background:#3e63dd"></span>Blue</td><td>Right backward</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted" style="margin-top:16px">Red + Yellow drives straight ahead. The receiver can only read one button at a time, so the tracks latch on and off instead of needing to be held. <kbd>OK</kbd> cycles the speed in any mode.</p>
+    <p class="note"><strong>Using a different remote?</strong> Press its buttons with the Serial Monitor open: each one prints as <code>IR:0x..</code>. Copy those codes into the <code>IR_...</code> defines at the top of <code>IDA.ino</code>.</p>
+  </div>
+</section>
+
+<section id="quickstart">
+  <div class="wrap">
+    <h2>Quick start</h2>
+    <h3 class="title">From USB cable to driving</h3>
+    <p class="muted">You need the <a href="https://docs.arduino.cc/software/ide/">Arduino IDE</a>, the bundled <code>Servo</code> library and <a href="https://github.com/Arduino-IRremote/Arduino-IRremote"><code>IRremote</code></a> v4+ from the Library Manager.</p>
+    <ol class="steps">
+      <li><strong>Check the motors first.</strong> Upload <code>scripts/motor_test/motor_test.ino</code>. It repeats forward, backward, left and right for 1.5&nbsp;s each and prints each step on the Serial Monitor. If a track spins the wrong way, swap that motor's two wires on the L298N (OUT1/OUT2 or OUT3/OUT4) instead of changing the code.</li>
+      <li><strong>Upload <code>scripts/IDA/IDA.ino</code>.</strong> On power-up the servo sweeps left and right, she beeps, then starts in obstacle mode.</li>
+      <li><strong>Take over</strong> with <kbd>2</kbd> or <kbd>3</kbd> on the remote.</li>
+    </ol>
+
+    <h3 class="sub">Tuning</h3>
+    <p class="muted">These values are at the top of <code>IDA.ino</code>. Edit them and re-upload over USB.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Setting</th><th>Default</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">turnTime</td><td>550&nbsp;ms</td><td>About a 180° pivot. Obstacle turns are a random 1/4 to all of this. Increase if her 180 falls short.</td></tr>
+          <tr><td class="mono">stopDist</td><td>35&nbsp;cm</td><td>How close an obstacle straight ahead gets before she stops and scans.</td></tr>
+          <tr><td class="mono">diagStopDist</td><td>35&nbsp;cm</td><td>The same, for the diagonal looks.</td></tr>
+          <tr><td class="mono">backupTime</td><td>250&nbsp;ms</td><td>How long she reverses before scanning (0 turns it off).</td></tr>
+          <tr><td class="mono">guardDist</td><td>15&nbsp;cm</td><td>How close an obstacle gets before the guard stops a manual drive.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="related">
+  <div class="wrap">
+    <h2>DREAM Robotics</h2>
+    <h3 class="title">The rest of the family</h3>
+    <div class="related">
+      <a href="https://github.com/CursedPrograms/MILA-Robot-v00">MILA-Robot-v00</a>
+      <a href="https://github.com/CursedPrograms/KIDA-Robot-v00">KIDA-Robot-v00</a>
+      <a href="https://github.com/CursedPrograms/KIDA-Robot-v01">KIDA-Robot-v01</a>
+      <a href="https://github.com/CursedPrograms/NORA-Robot-v00">NORA-Robot-v00</a>
+      <a href="https://github.com/CursedPrograms/WHIP-Robot-v00">WHIP-Robot-v00</a>
+      <a href="https://github.com/CursedPrograms/ARM-Robot-v01">ARM-Robot-v01</a>
+      <a href="https://github.com/CursedPrograms/RIFT">RIFT</a>
+      <a href="https://github.com/CursedPrograms/DREAM">DREAM</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="links">
+      <a href="https://github.com/CursedPrograms/IDA-Robot-v00">GitHub</a>
+      <a href="https://x.com/NorowaretaGemu">X: @NorowaretaGemu</a>
+      <a href="https://cursed-entertainment.itch.io/">itch.io</a>
+      <a href="https://ko-fi.com/cursedentertainment">Ko-fi</a>
+      <a href="https://github.com/CursedPrograms/IDA-Robot-v00/blob/main/LICENSE">MIT License</a>
+    </div>
+
+    <div class="logos">
+      <a href="https://ko-fi.com/cursedentertainment">
+        <img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support Cursed Entertainment on Ko-fi" width="180" loading="lazy">
+      </a>
+      <a href="https://cursed-entertainment.itch.io/">
+        <img src="https://github.com/CursedPrograms/cursedentertainment/raw/main/images/logos/logo-wide-grey.png" alt="Cursed Entertainment" width="250" loading="lazy">
+      </a>
+      <a href="https://github.com/SynthWomb">
+        <img src="https://github.com/SynthWomb/synth.womb/blob/main/logos/synthwomb07.png?raw=true" alt="SynthWomb" width="200" loading="lazy">
+      </a>
+    </div>
+
+    <div>&copy; Cursed Entertainment 2026</div>
+  </div>
+</footer>
+
+</body>
+</html>
