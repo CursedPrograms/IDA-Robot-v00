@@ -38,7 +38,7 @@ const int IN4 = 7;
 Servo myServo;
 
 // === TUNING ===
-int turnTime = 550; // ms — increase for wider turns
+int turnTime = 550; // ms — about a 180; obstacle turns are a random 1/4 to all of this
 int stopDist = 35;  // cm — how close before stopping (obstacle mode)
 int diagStopDist = 35; // cm — same, for the diagonal looks
 int backupTime = 250;  // ms — reverse this long before the scan so the tracks have room to pivot (0 = off)
@@ -205,6 +205,7 @@ void loop() {
   checkIR();
   if (driveMode != MODE_OBSTACLE) return;
 
+  unsigned long t = pickTurnTime(max(lastLeft, lastRight));
   if (lastLeft > lastRight) {
     Serial.println("TURN:LEFT");
     turnLeft();
@@ -212,9 +213,22 @@ void loop() {
     Serial.println("TURN:RIGHT");
     turnRight();
   }
+  delay(t);
 
   stopMotors();
   delay(100);
+}
+
+// Picks how long to pivot after the scan. turnTime is roughly a 180, so a
+// fixed turnTime always spun her round. Instead the turn is sized by how
+// open the chosen side is, with some randomness so she doesn't repeat the
+// same move in a corner.
+unsigned long pickTurnTime(long best) {
+  static bool seeded = false;
+  if (!seeded) { randomSeed(micros()); seeded = true; }   // first turn comes at a different moment every run
+  if (best > 2 * stopDist) return random(turnTime / 4, turnTime / 2);        // wide open: ~45-90 deg
+  if (best > stopDist)     return random(turnTime / 2, turnTime * 3 / 4);    // some room: ~90-135 deg
+  return random(turnTime * 3 / 4, turnTime + 1);                             // boxed in: ~135-180 deg
 }
 
 // =====================
@@ -365,14 +379,12 @@ void turnLeft() {
   analogWrite(ENA, pwmSpeed()); analogWrite(ENB, pwmSpeed());
   digitalWrite(IN1, LOW);  digitalWrite(IN2, HIGH);
   digitalWrite(IN3, LOW);  digitalWrite(IN4, HIGH);
-  if (driveMode == MODE_OBSTACLE) delay(turnTime);
 }
 
 void turnRight() {
   analogWrite(ENA, pwmSpeed()); analogWrite(ENB, pwmSpeed());
   digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);
   digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);
-  if (driveMode == MODE_OBSTACLE) delay(turnTime);
 }
 
 void leftMotorFwd() {

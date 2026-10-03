@@ -60,7 +60,7 @@
 IDA is MILA's little sibling: the same tank chassis cut down to a plain Arduino, an ultrasonic sensor on a servo, an IR receiver and an L298N. There is no WiFi or Bluetooth. Everything is driven from an IR remote.
 
 - **Drive modes:** OBSTACLE (autonomous, the default at boot), WASD (car-style) and TANK (independent tracks).
-- **Obstacle avoidance:** while driving, the sensor sweeps ahead and to both diagonals so walls met at an angle are caught too. When something is within 35 cm ahead or on a diagonal, IDA stops, backs up a little so the tracks have room to pivot, looks left and right and turns towards the more open side.
+- **Obstacle avoidance:** while driving, the sensor sweeps ahead and to both diagonals so walls met at an angle are caught too. When something is within 35 cm ahead or on a diagonal, IDA stops, backs up a little so the tracks have room to pivot, looks left and right and turns towards the more open side. The turn is a random size based on how much room there is: about 45–90° into open space, up to a full 180° when boxed in.
 - **Buzzer:** a high beep at power-up and a low beep whenever she stops for an obstacle or the collision guard trips.
 - **Safety:** in WASD and TANK modes a collision guard force-stops the robot if something gets within 15 cm while it is driving forward. In WASD mode it also stops as soon as you let go of the arrow key.
 - **Speed:** cycle 100 / 75 / 50 / 25 % with the OK button.
@@ -153,7 +153,7 @@ These values are at the top of `IDA.ino`. Edit them and re-upload over USB.
 
 | Setting | Default | |
 |---|---|---|
-| `turnTime` | 550 ms | How long an obstacle-mode turn lasts. Increase for wider turns |
+| `turnTime` | 550 ms | About a 180° pivot. Obstacle turns are a random 1/4 to all of this. Increase if her 180 falls short |
 | `stopDist` | 35 cm | How close an obstacle straight ahead gets before IDA stops and scans |
 | `diagStopDist` | 35 cm | The same, for the diagonal looks |
 | `backupTime` | 250 ms | How long IDA reverses before scanning (0 turns it off) |
