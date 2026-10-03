@@ -19,6 +19,7 @@ const int trigPin  = 8;
 const int echoPin  = 9;
 const int servoPin = 10;
 const int irPin    = 11;
+const int buzzerPin = A0;
 
 // L298N
 // On an Uno, Servo takes Timer1 (no PWM on 9/10) and IRremote takes
@@ -39,7 +40,7 @@ Servo myServo;
 // === TUNING ===
 int turnTime = 550; // ms — increase for wider turns
 int stopDist = 35;  // cm — how close before stopping (obstacle mode)
-int diagStopDist = 30; // cm — same, for the diagonal looks
+int diagStopDist = 35; // cm — same, for the diagonal looks
 int backupTime = 250;  // ms — reverse this long before the scan so the tracks have room to pivot (0 = off)
 int guardDist = 15; // cm — how close before force-stopping while driving forward in drive mode
 const unsigned long GUARD_POLL_MS = 150; // how often to check the front sensor in drive mode
@@ -48,8 +49,8 @@ const unsigned long GUARD_POLL_MS = 150; // how often to check the front sensor 
 // diagonals in turn. A wall met at an angle bounces the ping away from a
 // straight-ahead sensor, so it reads as clear; the diagonal looks face
 // the wall more squarely and catch it before a track corner does.
-// 120 = left diagonal, 60 = right diagonal.
-const int lookAngles[] = {90, 120, 90, 60};
+// 130 = left diagonal, 50 = right diagonal.
+const int lookAngles[] = {90, 130, 90, 50};
 const int NUM_LOOKS = 4;
 const int LOOK_SETTLE_MS = 120; // let the servo stop before pinging
 int lookIndex = 0;
@@ -93,6 +94,17 @@ bool          irDriving = false;   // true while a held arrow key is driving the
 // button at a time, so each color latches its track on or off instead.
 bool leftFwdOn = false, leftBwdOn = false, rightFwdOn = false, rightBwdOn = false;
 
+// === BUZZER ===
+// On an Uno, tone() and IRremote share Timer2, so the receiver is paused
+// for the length of the beep and restarted afterwards (as in IRremote's
+// ReceiveDemo). Blocks for durMs.
+void beep(unsigned int freq, unsigned int durMs) {
+  IrReceiver.stopTimer();
+  tone(buzzerPin, freq, durMs);
+  delay(durMs);
+  IrReceiver.restartTimer();
+}
+
 // === MODE & STATE ===
 enum DriveMode { MODE_OBSTACLE, MODE_WASD, MODE_TANK };
 DriveMode driveMode = MODE_OBSTACLE;   // boots straight into obstacle avoidance
@@ -127,6 +139,9 @@ void setup() {
   myServo.write(150); delay(500);
   myServo.write(90);  delay(300);
 
+  pinMode(buzzerPin, OUTPUT);
+  beep(2000, 200);
+
   Serial.println("IDA ready");
 }
 
@@ -160,7 +175,7 @@ void loop() {
 
   stopMotors();
   lookIndex = 0;
-  delay(100);
+  beep(400, 150);
 
   if (backupTime > 0) {
     backward();
@@ -250,6 +265,7 @@ void checkDriveGuard() {
     intentForward = false;
     leftFwdOn = leftBwdOn = rightFwdOn = rightBwdOn = false;
     Serial.println("GUARD");
+    beep(400, 150);
   }
 }
 

@@ -60,7 +60,8 @@
 IDA is MILA's little sibling: the same tank chassis cut down to a plain Arduino, an ultrasonic sensor on a servo, an IR receiver and an L298N. There is no WiFi or Bluetooth. Everything is driven from an IR remote.
 
 - **Drive modes:** OBSTACLE (autonomous, the default at boot), WASD (car-style) and TANK (independent tracks).
-- **Obstacle avoidance:** drives forward until something is within 35 cm, then stops, looks left and right with the servo and turns towards the more open side.
+- **Obstacle avoidance:** while driving, the sensor sweeps ahead and to both diagonals so walls met at an angle are caught too. When something is within 35 cm ahead or on a diagonal, IDA stops, backs up a little so the tracks have room to pivot, looks left and right and turns towards the more open side.
+- **Buzzer:** a high beep at power-up and a low beep whenever she stops for an obstacle or the collision guard trips.
 - **Safety:** in WASD and TANK modes a collision guard force-stops the robot if something gets within 15 cm while it is driving forward. In WASD mode it also stops as soon as you let go of the arrow key.
 - **Speed:** cycle 100 / 75 / 50 / 25 % with the OK button.
 - **Serial output:** distances, turns, mode changes and every IR code are printed on the Serial Monitor at 115200 baud.
@@ -77,6 +78,7 @@ IDA is MILA's little sibling: the same tank chassis cut down to a plain Arduino,
 - HC-SR04 Ultrasonic Sensor
 - 5V DC Motors
 - IR Receiver + IR Remote (the same remote as MILA)
+- Buzzer
 
 ---
 
@@ -110,7 +112,7 @@ RED + YELLOW drives straight ahead. Press a button again to switch that track of
 <details>
 <summary><b>Arduino pin assignments</b></summary>
 
-### Ultrasonic Sensor (HC-SR04) & Servo
+### Sensors, Servo & Buzzer
 
 | Signal | Pin |
 |---|---|
@@ -118,6 +120,7 @@ RED + YELLOW drives straight ahead. Press a button again to switch that track of
 | ECHO | 9 |
 | Servo | 10 |
 | IR Receiver | 11 |
+| Buzzer | A0 |
 
 ### L298N
 
@@ -151,7 +154,9 @@ These values are at the top of `IDA.ino`. Edit them and re-upload over USB.
 | Setting | Default | |
 |---|---|---|
 | `turnTime` | 550 ms | How long an obstacle-mode turn lasts. Increase for wider turns |
-| `stopDist` | 35 cm | How close an obstacle gets before IDA stops and scans |
+| `stopDist` | 35 cm | How close an obstacle straight ahead gets before IDA stops and scans |
+| `diagStopDist` | 35 cm | The same, for the diagonal looks |
+| `backupTime` | 250 ms | How long IDA reverses before scanning (0 turns it off) |
 | `guardDist` | 15 cm | How close an obstacle gets before the guard stops a manual drive |
 
 <br>
