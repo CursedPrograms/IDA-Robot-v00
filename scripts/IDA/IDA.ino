@@ -39,8 +39,20 @@ Servo myServo;
 // === TUNING ===
 int turnTime = 550; // ms — increase for wider turns
 int stopDist = 35;  // cm — how close before stopping (obstacle mode)
+int diagStopDist = 30; // cm — same, for the diagonal looks
+int backupTime = 250;  // ms — reverse this long before the scan so the tracks have room to pivot (0 = off)
 int guardDist = 15; // cm — how close before force-stopping while driving forward in drive mode
 const unsigned long GUARD_POLL_MS = 150; // how often to check the front sensor in drive mode
+
+// While driving in obstacle mode the sensor looks ahead and to both
+// diagonals in turn. A wall met at an angle bounces the ping away from a
+// straight-ahead sensor, so it reads as clear; the diagonal looks face
+// the wall more squarely and catch it before a track corner does.
+// 120 = left diagonal, 60 = right diagonal.
+const int lookAngles[] = {90, 120, 90, 60};
+const int NUM_LOOKS = 4;
+const int LOOK_SETTLE_MS = 120; // let the servo stop before pinging
+int lookIndex = 0;
 
 // === SPEED ===
 const int speedPresets[] = {100, 75, 50, 25};
@@ -128,18 +140,34 @@ void loop() {
   }
 
   // === OBSTACLE AVOIDANCE ===
-  myServo.write(90);
-  delay(300);
-  lastDist = getDistance();
-  Serial.print("DIST:"); Serial.println(lastDist);
+  int angle = lookAngles[lookIndex];
+  lookIndex = (lookIndex + 1) % NUM_LOOKS;
+  myServo.write(angle);
+  delay(LOOK_SETTLE_MS);
+  long d = getDistance();
 
-  if (lastDist > stopDist) {
+  if (angle == 90) {
+    lastDist = d;
+    Serial.print("DIST:"); Serial.println(d);
+  } else {
+    Serial.print(angle > 90 ? "DIAG_L:" : "DIAG_R:"); Serial.println(d);
+  }
+
+  if (d > (angle == 90 ? stopDist : diagStopDist)) {
     forward();
     return;
   }
 
   stopMotors();
-  delay(300);
+  lookIndex = 0;
+  delay(100);
+
+  if (backupTime > 0) {
+    backward();
+    delay(backupTime);
+    stopMotors();
+  }
+  delay(200);
 
   // Scan left
   myServo.write(150);
