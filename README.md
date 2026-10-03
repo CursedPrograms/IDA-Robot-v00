@@ -63,7 +63,10 @@
 ---
 
 
-![IDA Robot v00 — tracked chassis with HC-SR04 ultrasonic sensor](images/ida-robot-front.png)
+<div align="center">
+  <img src="images/ida-robot-front.png" alt="IDA Robot front view" width="400"/>
+  <img src="images/ida-robot-top.png" alt="IDA Robot top view" width="400"/>
+</div>
 
 <br>
 <div align="center">© Cursed Entertainment 2026</div>
