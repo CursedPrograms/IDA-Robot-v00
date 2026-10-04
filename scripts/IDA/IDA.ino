@@ -111,6 +111,20 @@ unsigned long holdMs    = IR_HOLD_MS;   // release timeout for the current drive
 #define LINK_SPEED     0x4F   // cycle 100 / 75 / 50 / 25 %
 const unsigned long LINK_HOLD_MS = 500;
 
+// === TALKING WITH NORA ===
+// NORA "talks" to IDA over the same link: 0x40 + phrase (hello, how are you,
+// happy, curious, sleepy, let's play, bye) after chirping it on her own
+// buzzer, and IDA answers on hers. 0x47 is NORA's silent "I am here" beacon:
+// when it comes back after NORA_AWAY_MS of silence, IDA greets her. While IDA
+// is driving she only gives a short chirp, so her answer never holds up the
+// obstacle checks or the drive guard.
+#define TALK_FIRST  0x40
+#define TALK_LAST   0x46
+#define TALK_BEACON 0x47
+const unsigned long NORA_AWAY_MS = 60000;
+unsigned long lastNoraMs = 0;
+bool          noraSeen   = false;
+
 // Tank mode is button-toggled, not held: the receiver only decodes one
 // button at a time, so each color latches its track on or off instead.
 bool leftFwdOn = false, leftBwdOn = false, rightFwdOn = false, rightBwdOn = false;
@@ -125,6 +139,19 @@ void beep(unsigned int freq, unsigned int durMs) {
   delay(durMs);
   IrReceiver.restartTimer();
 }
+
+// IDA's answers: up to four {freq, ms} notes, freq 0 = a rest, ms 0 = the
+// end. Higher and quicker than NORA's voice, so you can tell who's talking.
+const uint16_t TALK_REPLY[7][8] PROGMEM = {
+  {1200,  80, 1600, 120,    0,   0,    0, 0 },   // hello -> "hi!"
+  {1500,  80, 1300,  80, 1800, 140,    0, 0 },   // how are you? -> "great!"
+  {1600,  50, 2000,  50, 1600,  50, 2200, 120},   // happy -> trill
+  { 900,  80,    0,  40, 1400, 160,    0, 0 },   // curious -> "hm? oh!"
+  { 900, 160,  700, 220,    0,   0,    0, 0 },   // sleepy -> yawn
+  {1800,  60, 1800,  60, 2400, 140,    0, 0 },   // let's play -> "yes yes!"
+  {1600, 100, 1100, 180,    0,   0,    0, 0 },   // bye -> "bye"
+};
+const char* const TALK_NAMES[7] = { "hello", "how are you", "happy", "curious", "sleepy", "play", "bye" };
 
 // === MODE & STATE ===
 enum DriveMode { MODE_OBSTACLE, MODE_WASD, MODE_TANK };
@@ -288,6 +315,7 @@ void checkIR() {
 // mode if she isn't already in it, so one press from NORA is enough; each
 // repeated frame keeps the drive alive until the link goes quiet.
 void runLinkCommand(uint8_t c, bool isRepeat) {
+  if (c >= TALK_FIRST && c <= TALK_BEACON) { hearNora(c); return; }
   switch (c) {
     case LINK_FORWARD: case LINK_BACKWARD: case LINK_LEFT: case LINK_RIGHT:
       if (driveMode != MODE_WASD) setMode(MODE_WASD);
@@ -309,6 +337,41 @@ void runLinkCommand(uint8_t c, bool isRepeat) {
     case LINK_MANUAL:   if (!isRepeat) setMode(MODE_WASD);     break;
     case LINK_SPEED:    if (!isRepeat) cycleSpeed();           break;
   }
+}
+
+// True while the motors may be running: IDA answers with one short chirp then.
+bool isDriving() {
+  return driveMode == MODE_OBSTACLE || irDriving || leftFwdOn || leftBwdOn || rightFwdOn || rightBwdOn;
+}
+
+// Play one of the answer phrases (blocking, at most ~0.4 s).
+void sing(uint8_t phrase) {
+  for (uint8_t i = 0; i < 4; i++) {
+    uint16_t f = pgm_read_word(&TALK_REPLY[phrase][i * 2]);
+    uint16_t d = pgm_read_word(&TALK_REPLY[phrase][i * 2 + 1]);
+    if (d == 0) break;
+    if (f) beep(f, d); else delay(d);
+    delay(20);
+  }
+}
+
+// NORA said something (or her beacon arrived): answer, or greet her if
+// she's been away.
+void hearNora(uint8_t c) {
+  bool wasAway = !noraSeen || millis() - lastNoraMs > NORA_AWAY_MS;
+  lastNoraMs = millis();
+  noraSeen   = true;
+
+  if (c == TALK_BEACON) {
+    if (!wasAway) return;                // she's still around: nothing to say
+    Serial.println("TALK:NORA is back");
+    c = TALK_FIRST;                      // greet her with a hello
+  } else {
+    Serial.print("TALK:");
+    Serial.println(TALK_NAMES[c - TALK_FIRST]);
+  }
+  if (isDriving()) beep(1800, 40);       // busy: just a quick "mm-hm"
+  else             sing(c - TALK_FIRST);
 }
 
 // =====================

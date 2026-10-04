@@ -124,6 +124,9 @@ NORA can drive IDA through her IR transmitter, from NORA's web page, Python cont
 
 A drive command switches IDA into WASD mode by itself. NORA re-sends it every 150 ms while the button is held, and IDA stops once the link has been quiet for 500 ms. Link frames print on the Serial Monitor as `LINK:0x..`.
 
+### Talking with NORA
+NORA also chats with IDA over the link (`0x40` hello, `0x41` how are you, `0x42` happy, `0x43` curious, `0x44` sleepy, `0x45` let's play, `0x46` bye, `0x47` "I am here" beacon (silent)). IDA answers each phrase with her own buzzer melody, higher and quicker than NORA's, and prints `TALK:<phrase>` on the Serial Monitor. When NORA's beacon comes back after a minute of silence, IDA greets her (`TALK:NORA is back`). While she's driving (including OBSTACLE mode) she only gives a 40 ms chirp, so answering never holds up the obstacle checks.
+
 > [!TIP]
 > Using a different remote? Press its buttons with the Serial Monitor open: each one prints as `IR:0x..`. Copy those codes into the `IR_...` defines at the top of `IDA.ino`.
 

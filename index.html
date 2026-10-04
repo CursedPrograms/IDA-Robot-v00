@@ -207,6 +207,8 @@
       </table>
     </div>
     <p class="muted spaced">A drive command switches her into WASD mode by itself. NORA re-sends it every 150&nbsp;ms while held, and IDA stops once the link has been quiet for 500&nbsp;ms. Link frames print on the Serial Monitor as <code>LINK:0x..</code>.</p>
+    <h3 class="sub">Talking with NORA</h3>
+    <p class="muted">NORA chats with IDA over the same link (<code>0x40</code> hello, <code>0x41</code> how are you, <code>0x42</code> happy, <code>0x43</code> curious, <code>0x44</code> sleepy, <code>0x45</code> let&rsquo;s play, <code>0x46</code> bye, <code>0x47</code> &ldquo;I am here&rdquo; beacon (silent)). IDA answers each phrase with her own buzzer melody and prints <code>TALK:&lt;phrase&gt;</code> on the Serial Monitor, and greets NORA when she comes back after a minute away. While she&rsquo;s driving she just chirps, so answering never holds up the obstacle checks.</p>
     <p class="note"><strong>Using a different remote?</strong> Press its buttons with the Serial Monitor open: each one prints as <code>IR:0x..</code>. Copy those codes into the <code>IR_...</code> defines at the top of <code>IDA.ino</code>.</p>
   </div>
 </section>
