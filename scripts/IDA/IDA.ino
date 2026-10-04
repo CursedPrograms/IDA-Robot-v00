@@ -140,17 +140,11 @@ void beep(unsigned int freq, unsigned int durMs) {
   IrReceiver.restartTimer();
 }
 
-// IDA's answers: up to four {freq, ms} notes, freq 0 = a rest, ms 0 = the
-// end. Higher and quicker than NORA's voice, so you can tell who's talking.
-const uint16_t TALK_REPLY[7][8] PROGMEM = {
-  {1200,  80, 1600, 120,    0,   0,    0, 0 },   // hello -> "hi!"
-  {1500,  80, 1300,  80, 1800, 140,    0, 0 },   // how are you? -> "great!"
-  {1600,  50, 2000,  50, 1600,  50, 2200, 120},   // happy -> trill
-  { 900,  80,    0,  40, 1400, 160,    0, 0 },   // curious -> "hm? oh!"
-  { 900, 160,  700, 220,    0,   0,    0, 0 },   // sleepy -> yawn
-  {1800,  60, 1800,  60, 2400, 140,    0, 0 },   // let's play -> "yes yes!"
-  {1600, 100, 1100, 180,    0,   0,    0, 0 },   // bye -> "bye"
-};
+// IDA's answers, in Brainfuck: phrase n from NORA gets reply 7 + n from
+// talk_bf.h (a program printing "hi!", "ok:)"...), beeped one tone per
+// symbol, higher than NORA's voice so you can tell who's talking.
+#include "talk_bf.h"
+const uint8_t TALK_VOICE_PCT = 125;
 const char* const TALK_NAMES[7] = { "hello", "how are you", "happy", "curious", "sleepy", "play", "bye" };
 
 // === MODE & STATE ===
@@ -344,17 +338,6 @@ bool isDriving() {
   return driveMode == MODE_OBSTACLE || irDriving || leftFwdOn || leftBwdOn || rightFwdOn || rightBwdOn;
 }
 
-// Play one of the answer phrases (blocking, at most ~0.4 s).
-void sing(uint8_t phrase) {
-  for (uint8_t i = 0; i < 4; i++) {
-    uint16_t f = pgm_read_word(&TALK_REPLY[phrase][i * 2]);
-    uint16_t d = pgm_read_word(&TALK_REPLY[phrase][i * 2 + 1]);
-    if (d == 0) break;
-    if (f) beep(f, d); else delay(d);
-    delay(20);
-  }
-}
-
 // NORA said something (or her beacon arrived): answer, or greet her if
 // she's been away.
 void hearNora(uint8_t c) {
@@ -371,7 +354,7 @@ void hearNora(uint8_t c) {
     Serial.println(TALK_NAMES[c - TALK_FIRST]);
   }
   if (isDriving()) beep(1800, 40);       // busy: just a quick "mm-hm"
-  else             sing(c - TALK_FIRST);
+  else             talkPlayBlocking(7 + (c - TALK_FIRST), TALK_VOICE_PCT, beep);   // her reply, 1-4 s
 }
 
 // =====================
