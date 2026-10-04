@@ -30,6 +30,11 @@
 - Robot Type: Tank
 
 <div align="center">
+  <img src="images/ida_avatar.jpg" alt="IDA avatar: a human representation of the robot" width="320"/>
+  <p><i>IDA</i></p>
+</div>
+
+<div align="center">
   <img src="images/ida-robot-front.png" alt="IDA Robot front view" width="400"/>
   <img src="images/ida-robot-top.png" alt="IDA Robot top view" width="400"/>
 </div>
