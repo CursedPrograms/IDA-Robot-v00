@@ -188,7 +188,23 @@ void setup() {
 }
 
 // =====================
+// The fleet-wide handshake: a PC asking "WHO" over USB gets "I am Ida".
+void checkSerial() {
+  static String buf;
+  while (Serial.available()) {
+    char c = Serial.read();
+    if (c == '\n') {
+      buf.trim();
+      if (buf == "WHO") Serial.println("I am Ida");
+      buf = "";
+    } else if (buf.length() < 16) {
+      buf += c;
+    }
+  }
+}
+
 void loop() {
+  checkSerial();
   checkIR();
 
   if (driveMode != MODE_OBSTACLE) {
