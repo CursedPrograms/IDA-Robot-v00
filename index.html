@@ -189,6 +189,24 @@
       </table>
     </div>
     <p class="muted spaced">Red + Yellow drives straight ahead. The receiver can only read one button at a time, so the tracks latch on and off instead of needing to be held. <kbd>OK</kbd> cycles the speed in any mode.</p>
+    <h3 class="sub">IDA link: driven by NORA</h3>
+    <p class="muted"><a href="https://cursedprograms.github.io/NORA-Robot-v00/">NORA</a> can drive IDA through her IR transmitter, from NORA's web page, Python controller or Bluetooth link. The link has its own protocol so nothing else in the fleet reacts to it: Samsung-format IR (38&nbsp;kHz), address <code>0x0DA1</code>.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Code</th><th>Command</th></tr></thead>
+        <tbody>
+          <tr><td><code>0x48</code></td><td>Forward</td></tr>
+          <tr><td><code>0x49</code></td><td>Backward</td></tr>
+          <tr><td><code>0x4A</code></td><td>Left</td></tr>
+          <tr><td><code>0x4B</code></td><td>Right</td></tr>
+          <tr><td><code>0x4C</code></td><td>Stop (also leaves Obstacle mode)</td></tr>
+          <tr><td><code>0x4D</code></td><td>Obstacle mode</td></tr>
+          <tr><td><code>0x4E</code></td><td>WASD mode</td></tr>
+          <tr><td><code>0x4F</code></td><td>Cycle speed</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted spaced">A drive command switches her into WASD mode by itself. NORA re-sends it every 150&nbsp;ms while held, and IDA stops once the link has been quiet for 500&nbsp;ms. Link frames print on the Serial Monitor as <code>LINK:0x..</code>.</p>
     <p class="note"><strong>Using a different remote?</strong> Press its buttons with the Serial Monitor open: each one prints as <code>IR:0x..</code>. Copy those codes into the <code>IR_...</code> defines at the top of <code>IDA.ino</code>.</p>
   </div>
 </section>

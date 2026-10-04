@@ -62,7 +62,7 @@
 
 ## Overview
 
-IDA is MILA's little sibling: the same tank chassis cut down to a plain Arduino, an ultrasonic sensor on a servo, an IR receiver and an L298N. There is no WiFi or Bluetooth. Everything is driven from an IR remote.
+IDA is MILA's little sibling: the same tank chassis cut down to a plain Arduino, an ultrasonic sensor on a servo, an IR receiver and an L298N. There is no WiFi or Bluetooth. Everything is driven from an IR remote, or by [NORA](https://github.com/CursedPrograms/NORA-Robot-v00) over the IR link below.
 
 - **Drive modes:** OBSTACLE (autonomous, the default at boot), WASD (car-style) and TANK (independent tracks).
 - **Obstacle avoidance:** while driving, the sensor sweeps ahead and to both diagonals so walls met at an angle are caught too. When something is within 35 cm ahead or on a diagonal, IDA stops, backs up a little so the tracks have room to pivot, looks left and right and turns towards the more open side. The turn is a random size based on how much room there is: about 45–90° into open space, up to a full 180° when boxed in.
@@ -106,6 +106,23 @@ IDA is MILA's little sibling: the same tank chassis cut down to a plain Arduino,
 | BLUE | Right backward |
 
 RED + YELLOW drives straight ahead. Press a button again to switch that track off. The receiver can only read one button at a time, so the tracks latch on and off instead of needing to be held.
+
+### IDA link (driven by NORA)
+
+NORA can drive IDA through her IR transmitter, from NORA's web page, Python controller or Bluetooth link. The link uses its own protocol so nothing else in the fleet reacts to it: **Samsung-format IR (38 kHz), address `0x0DA1`**, with command codes no fleet remote uses.
+
+| Code | Command |
+|---|---|
+| `0x48` | Forward |
+| `0x49` | Backward |
+| `0x4A` | Left |
+| `0x4B` | Right |
+| `0x4C` | Stop (also leaves OBSTACLE mode) |
+| `0x4D` | OBSTACLE mode |
+| `0x4E` | WASD mode |
+| `0x4F` | Cycle speed |
+
+A drive command switches IDA into WASD mode by itself. NORA re-sends it every 150 ms while the button is held, and IDA stops once the link has been quiet for 500 ms. Link frames print on the Serial Monitor as `LINK:0x..`.
 
 > [!TIP]
 > Using a different remote? Press its buttons with the Serial Monitor open: each one prints as `IR:0x..`. Copy those codes into the `IR_...` defines at the top of `IDA.ino`.
