@@ -60,7 +60,11 @@ const int speedPresets[] = {100, 75, 50, 25};
 const int NUM_SPEED_PRESETS = 4;
 int speedIndex = 0;
 
-int pwmSpeed() { return (255 * speedPresets[speedIndex]) / 100; }
+// NORA's LOCK over the fleet link (LINK_LOCK): the wheels stay still, whatever drives them
+// (remote, link, obstacle mode), until her UNLOCK (LINK_UNLOCK). Unlocked at boot.
+bool linkLocked = false;
+
+int pwmSpeed() { return linkLocked ? 0 : (255 * speedPresets[speedIndex]) / 100; }   // every motor function goes through here
 
 void cycleSpeed() {
   speedIndex = (speedIndex + 1) % NUM_SPEED_PRESETS;
@@ -109,6 +113,8 @@ unsigned long holdMs    = IR_HOLD_MS;   // release timeout for the current drive
 #define LINK_OBSTACLE  0x4D
 #define LINK_MANUAL    0x4E   // WASD mode
 #define LINK_SPEED     0x4F   // cycle 100 / 75 / 50 / 25 %
+#define LINK_UNLOCK    0x50   // NORA frees the wheels
+#define LINK_LOCK      0x51   // NORA locks them: stop, and no driving until LINK_UNLOCK
 const unsigned long LINK_HOLD_MS = 500;
 
 // === TALKING WITH NORA ===
@@ -346,6 +352,8 @@ void runLinkCommand(uint8_t c, bool isRepeat) {
     case LINK_OBSTACLE: if (!isRepeat) setMode(MODE_OBSTACLE); break;
     case LINK_MANUAL:   if (!isRepeat) setMode(MODE_WASD);     break;
     case LINK_SPEED:    if (!isRepeat) cycleSpeed();           break;
+    case LINK_UNLOCK:   linkLocked = false;                    break;
+    case LINK_LOCK:     linkLocked = true; setMode(MODE_WASD); break;   // stop, out of obstacle mode
   }
 }
 
