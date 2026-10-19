@@ -146,6 +146,21 @@ void beep(unsigned int freq, unsigned int durMs) {
   IrReceiver.restartTimer();
 }
 
+// Getting close while driving forward: a short tick, faster the nearer the wall, like NORA's
+// proximity tone and a car's parking sensor. Ticks (not one long tone) because the buzzer shares
+// Timer2 with the IR receiver: beep() pauses it for 15 ms each time. From PROX_TICK_CM before
+// `stopCm` (where she stops by herself) down to it; silent further away.
+const long PROX_TICK_CM = 25;
+void proximityTick(long d, long stopCm) {
+  static unsigned long lastTick = 0;
+  if (d <= 0 || d >= stopCm + PROX_TICK_CM) return;
+  long near = constrain(d, stopCm, stopCm + PROX_TICK_CM);
+  unsigned long gap = map(near, stopCm, stopCm + PROX_TICK_CM, 80, 600);
+  if (millis() - lastTick < gap) return;
+  lastTick = millis();
+  beep(1400, 15);
+}
+
 // IDA's answers, in Brainfuck: phrase n from NORA gets reply 7 + n from
 // talk_bf.h (a program printing "hi!", "ok:)"...), beeped one tone per
 // symbol, higher than NORA's voice so you can tell who's talking.
@@ -233,6 +248,7 @@ void loop() {
   }
 
   if (d > (angle == 90 ? stopDist : diagStopDist)) {
+    if (angle == 90) proximityTick(d, stopDist);
     forward();
     return;
   }
@@ -401,6 +417,7 @@ void checkDriveGuard() {
 
   lastDist = getDistance();
 
+  if (intentForward) proximityTick(lastDist, guardDist);
   if (intentForward && lastDist > 0 && lastDist < guardDist) {
     stopMotors();
     intentForward = false;
