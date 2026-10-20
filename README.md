@@ -72,6 +72,8 @@ IDA is MILA's little sibling: the same tank chassis cut down to a plain Arduino,
 - **Buzzer:** a high beep at power-up and a low beep whenever she stops for an obstacle or the collision guard trips.
 - **Safety:** in WASD and TANK modes a collision guard force-stops the robot if something gets within 15 cm while it is driving forward. In WASD mode it also stops as soon as you let go of the arrow key.
 - **Speed:** cycle 100 / 75 / 50 / 25 % with the OK button.
+- **Ticks near walls:** driving forward, the buzzer ticks faster as a wall gets close, like a parking sensor (from 25 cm before she'd stop).
+- **Her mind (through NORA):** **H** on NORA's Python controller runs IDA's LLM mind and drives her over the IR link. She can't report anything back, so her mind knows she's blind: one short step at a time, and her own collision guard still stops her. She's timid and devoted to NORA.
 - **Serial output:** distances, turns, mode changes and every IR code are printed on the Serial Monitor at 115200 baud.
 
 ---
