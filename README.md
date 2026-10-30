@@ -97,6 +97,7 @@ IDA is MILA's little sibling: the same tank chassis cut down to a plain Arduino,
 | Button | |
 |---|---|
 | `1` | OBSTACLE mode: drives itself and avoids obstacles |
+| `4` / `5` / `6` | FOLLOW mode (keeps your hand 30 cm from her sonar) / HELLO / DANCE, on the spot (codes guessed: 0x3, 0x4, 0x5) |
 | `2` | WASD mode: hold an arrow to drive, release to stop |
 | `3` | TANK mode: each colour button switches one track on or off |
 | `OK` | Cycle speed 100 / 75 / 50 / 25 % |

@@ -83,6 +83,9 @@ void cycleSpeed() {
 #define IR_MODE_OBSTACLE 0x0   // "1"
 #define IR_MODE_WASD     0x1   // "2"
 #define IR_MODE_TANK     0x2   // "3"
+#define IR_FOLLOW        0x3   // "4" (a guess, as WHIP's "3"-"7": read it with MILA's ir_diagnostic)
+#define IR_HELLO         0x4   // "5"
+#define IR_DANCE         0x5   // "6"
 
 #define IR_RED    0x25   // tank: left track forward
 #define IR_GREEN  0x26   // tank: left track backward
@@ -174,7 +177,7 @@ const uint8_t TALK_VOICE_PCT = 125;
 const char* const TALK_NAMES[7] = { "hello", "how are you", "happy", "curious", "sleepy", "play", "bye" };
 
 // === MODE & STATE ===
-enum DriveMode { MODE_OBSTACLE, MODE_WASD, MODE_TANK };
+enum DriveMode { MODE_OBSTACLE, MODE_WASD, MODE_TANK, MODE_FOLLOW };
 DriveMode driveMode = MODE_OBSTACLE;   // boots straight into obstacle avoidance
 
 // Declared by hand: the IDE's auto-generated prototypes go above this
@@ -232,6 +235,11 @@ void checkSerial() {
 void loop() {
   checkSerial();
   checkIR();
+
+  if (driveMode == MODE_FOLLOW) {
+    followHand();
+    return;
+  }
 
   if (driveMode != MODE_OBSTACLE) {
     checkDriveGuard();
@@ -412,7 +420,58 @@ void setMode(DriveMode m) {
   leftFwdOn = leftBwdOn = rightFwdOn = rightBwdOn = false;
   stopMotors();
   myServo.write(90);
-  Serial.println(m == MODE_OBSTACLE ? "MODE:OBSTACLE" : m == MODE_WASD ? "MODE:WASD" : "MODE:TANK");
+  Serial.println(m == MODE_OBSTACLE ? "MODE:OBSTACLE" : m == MODE_WASD ? "MODE:WASD" : m == MODE_FOLLOW ? "MODE:FOLLOW" : "MODE:TANK");
+}
+
+// ---- FOLLOW: keep a hand 30 cm from her sonar (WHIP's follow-me) ----
+const long FOLLOW_CM = 30;
+const long FOLLOW_DEADBAND_CM = 4;   // close enough: stand
+const long FOLLOW_LOST_CM = 80;      // nothing nearer than this: nobody to follow, stand
+const int FOLLOW_PULSE_MS = 120;     // short pulses, so she doesn't overshoot
+
+void followHand() {
+  static unsigned long lastPing = 0;
+  if (millis() - lastPing < GUARD_POLL_MS) return;
+  lastPing = millis();
+
+  lastDist = getDistance();
+  Serial.print("DIST:"); Serial.println(lastDist);
+  const long e = lastDist - FOLLOW_CM;
+  if (lastDist <= 0 || lastDist > FOLLOW_LOST_CM || labs(e) <= FOLLOW_DEADBAND_CM) return;
+
+  if (e > 0) forward();
+  else backward();
+  delay(FOLLOW_PULSE_MS);
+  stopMotors();
+}
+
+// ---- HELLO and DANCE: on the spot, so there's no wall to hit ----
+void waveHello() {
+  stopMotors();
+  beep(1200, 80);
+  beep(1600, 120);
+  for (int i = 0; i < 3; i++) {   // shakes her sonar head
+    myServo.write(60);  delay(220);
+    myServo.write(120); delay(220);
+  }
+  myServo.write(90);
+  delay(200);
+}
+
+void dance() {
+  stopMotors();
+  for (int i = 0; i < 8; i++) {   // a beat: left, right, her head the other way
+    const bool left = i % 2 == 0;
+    myServo.write(left ? 130 : 50);
+    if (left) turnLeft();
+    else turnRight();
+    beep(left ? 880 : 1320, 100);
+    delay(160);
+    stopMotors();
+    delay(60);
+  }
+  myServo.write(90);
+  delay(200);
 }
 
 // Polls the front sensor in WASD/TANK and force-stops if something gets
@@ -453,6 +512,9 @@ void runIRCommand(uint8_t cmd) {
     case IR_MODE_OBSTACLE: setMode(MODE_OBSTACLE); break;
     case IR_MODE_WASD:     setMode(MODE_WASD);     break;
     case IR_MODE_TANK:     setMode(MODE_TANK);     break;
+    case IR_FOLLOW:        setMode(MODE_FOLLOW);   break;
+    case IR_HELLO:         if (driveMode != MODE_OBSTACLE && driveMode != MODE_FOLLOW) waveHello(); break;
+    case IR_DANCE:         if (driveMode != MODE_OBSTACLE && driveMode != MODE_FOLLOW) dance();     break;
     case IR_OK:            cycleSpeed();           break;
 
     case IR_FORWARD:
