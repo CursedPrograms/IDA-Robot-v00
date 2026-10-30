@@ -1,0 +1,34 @@
+{
+ "name": "IDA",
+ "port": 5002,
+ "host": "192.168.4.1",
+ "status": "/sensors",
+ "connect": [
+  "GET /ida?c=manual"
+ ],
+ "stop": "GET /ida?c=stop",
+ "keys": {
+  "w": "GET /ida?c=fw",
+  "s": "GET /ida?c=bw",
+  "a": "GET /ida?c=left",
+  "d": "GET /ida?c=right"
+ },
+ "buttons": [
+  [
+   "MANUAL",
+   "GET /ida?c=manual"
+  ],
+  [
+   "AUTO",
+   "GET /ida?c=auto"
+  ],
+  [
+   "SPEED",
+   "GET /ida?c=speed"
+  ]
+ ],
+ "tiles": [],
+ "background": "#090B10",
+ "text": "#F2EDE9",
+ "accent": "#D6935A"
+}
