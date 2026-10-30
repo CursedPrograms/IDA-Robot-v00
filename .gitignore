@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# Controllers, built and kept
+!builds/
+!builds/*.exe
