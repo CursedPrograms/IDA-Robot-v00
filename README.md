@@ -72,6 +72,7 @@ IDA is MILA's little sibling: the same tank chassis cut down to a plain Arduino,
 - **Buzzer:** a high beep at power-up and a low beep whenever she stops for an obstacle or the collision guard trips.
 - **Safety:** in WASD and TANK modes a collision guard force-stops the robot if something gets within 15 cm while it is driving forward. In WASD mode it also stops as soon as you let go of the arrow key.
 - **Speed:** cycle 100 / 75 / 50 / 25 % with the OK button.
+- **FOLLOW, HELLO and DANCE:** on her remote's 4, 5 and 6 (guessed codes): she keeps your hand 30 cm from her sonar, or shakes her sonar head and dances on the spot.
 - **Ticks near walls:** driving forward, the buzzer ticks faster as a wall gets close, like a parking sensor (from 25 cm before she'd stop).
 - **Her mind (through NORA):** **H** on NORA's Python controller runs IDA's LLM mind and drives her over the IR link. She can't report anything back, so her mind knows she's blind: one short step at a time, and her own collision guard still stops her. She's timid and devoted to NORA.
 - **Serial output:** distances, turns, mode changes and every IR code are printed on the Serial Monitor at 115200 baud.
@@ -211,6 +212,6 @@ These values are at the top of `IDA.ino`. Edit them and re-upload over USB.
 ## The DREAM Robotics ecosystem
 
 **Minds** — [DREAM](https://github.com/CursedPrograms/DREAM) companion · [TINA](https://github.com/CursedPrograms/TINA) engineer · [NINA](https://github.com/CursedPrograms/NINA) caretaker · [RIFT](https://github.com/CursedPrograms/RIFT) fleet hub · [LYCEA](https://github.com/CursedPrograms/LYCEA) training school  
-**Robots** — [NORA](https://github.com/CursedPrograms/NORA-Robot-v00) · [MILA](https://github.com/CursedPrograms/MILA-Robot-v00) · [WHIP](https://github.com/CursedPrograms/WHIP-Robot-v00) · [KIDA-00](https://github.com/CursedPrograms/KIDA-Robot-v00) · [KIDA-01](https://github.com/CursedPrograms/KIDA-Robot-v01) · [IDA](https://github.com/CursedPrograms/IDA-Robot-v00) · [ARM](https://github.com/CursedPrograms/ARM-Robot-v01) · [NIKA](https://github.com/CursedPrograms/NIKA-Robot-v00)  
+**Robots** — [NORA](https://github.com/CursedPrograms/NORA-Robot-v00) · [MILA](https://github.com/CursedPrograms/MILA-Robot-v00) · [WHIP](https://github.com/CursedPrograms/WHIP-Robot-v00) · [KIDA-00](https://github.com/CursedPrograms/KIDA-Robot-v00) · [KIDA-01](https://github.com/CursedPrograms/KIDA-Robot-v01) · [IDA](https://github.com/CursedPrograms/IDA-Robot-v00) · [ARM](https://github.com/CursedPrograms/ARM-Robot-v01) · [NIKA](https://github.com/CursedPrograms/NIKA-Robot-v00) · [ARIA](https://github.com/CursedPrograms/ARIA-Robot-v00)  
 **Remotes** — [RITA](https://github.com/CursedPrograms/RITA) handheld remote  
 <!-- DREAM-ECOSYSTEM:END -->
