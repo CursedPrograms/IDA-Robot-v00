@@ -162,36 +162,16 @@ IDA is MILA's little sibling: the same tank chassis cut down to a plain Arduino,
 
 | Key | Does |
 |---|---|
-| 1 | OBSTACLE mode |
+| 1 | OBSTACLE mode: drives itself and avoids obstacles |
 | 2 | WASD mode: hold an arrow to drive, release to stop |
 | 3 | TANK mode: each colour button switches one track on or off |
-| 4 / 5 / 6 | FOLLOW mode / HELLO / DANCE |
+| 4 / 5 / 6 | FOLLOW mode (keeps your hand 30 cm from her sonar) / HELLO / DANCE, on the spot (codes guessed: 0x3, 0x4, 0x5) |
 | OK | cycle speed 100 / 75 / 50 / 25 % |
 | RED / GREEN | left track forward / back (TANK mode) |
 | YELLOW / BLUE | right track forward / back (TANK mode) |
+| | *RED + YELLOW drives straight ahead. Press a button again to switch that track off. The receiver can only read one button at a time, so the tracks latch on and off instead of needing to be held.* |
 
 <!-- keymap:end -->
-
-## Controls (IR remote)
-
-| Button | |
-|---|---|
-| `1` | OBSTACLE mode: drives itself and avoids obstacles |
-| `4` / `5` / `6` | FOLLOW mode (keeps your hand 30 cm from her sonar) / HELLO / DANCE, on the spot (codes guessed: 0x3, 0x4, 0x5) |
-| `2` | WASD mode: hold an arrow to drive, release to stop |
-| `3` | TANK mode: each colour button switches one track on or off |
-| `OK` | Cycle speed 100 / 75 / 50 / 25 % |
-
-**TANK mode buttons**
-
-| Button | Track |
-|---|---|
-| RED | Left forward |
-| GREEN | Left backward |
-| YELLOW | Right forward |
-| BLUE | Right backward |
-
-RED + YELLOW drives straight ahead. Press a button again to switch that track off. The receiver can only read one button at a time, so the tracks latch on and off instead of needing to be held.
 
 ### IDA link (driven by NORA)
 

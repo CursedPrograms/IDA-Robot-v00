@@ -20,13 +20,15 @@ KEYMAP = [
         ("I J K L", "drive IDA from NORA's page"),
     ]),
     ("IR remote", [
-        ("1", "OBSTACLE mode"),
+        ("1", "OBSTACLE mode: drives itself and avoids obstacles"),
         ("2", "WASD mode: hold an arrow to drive, release to stop"),
         ("3", "TANK mode: each colour button switches one track on or off"),
-        ("4 / 5 / 6", "FOLLOW mode / HELLO / DANCE"),
+        ("4 / 5 / 6", "FOLLOW mode (keeps your hand 30 cm from her sonar) / HELLO / DANCE, on the spot (codes guessed: 0x3, 0x4, 0x5)"),
         ("OK", "cycle speed 100 / 75 / 50 / 25 %"),
         ("RED / GREEN", "left track forward / back (TANK mode)"),
         ("YELLOW / BLUE", "right track forward / back (TANK mode)"),
+        ("", "RED + YELLOW drives straight ahead. Press a button again to switch that track off. "
+             "The receiver can only read one button at a time, so the tracks latch on and off instead of needing to be held."),
     ]),
 ]
 
