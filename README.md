@@ -51,8 +51,9 @@
 
 **Other languages:** `scripts/controllers` has this robot's controller in C#, F#, Rust, Go and Julia, all reading one `robot.json`: W A S D to drive, the mode buttons and the sensors. See its README for how to run each.
 
-## Related Projects
+---
 
+## Related Projects
 
 <table>
   <tr>
@@ -71,12 +72,16 @@
     <td align="center"><a href="https://github.com/CursedPrograms/RITA"><img src="https://raw.githubusercontent.com/CursedPrograms/RITA/main/images/avatar_round.png" width="72" alt="RITA"><br>RITA</a></td>
     <td align="center"><a href="https://github.com/CursedPrograms/NINA"><img src="https://raw.githubusercontent.com/CursedPrograms/NINA/main/images/avatar_round.png" width="72" alt="NINA"><br>NINA</a></td>
     <td align="center"><a href="https://github.com/CursedPrograms/TINA"><img src="https://raw.githubusercontent.com/CursedPrograms/TINA/main/images/avatar_round.png" width="72" alt="TINA"><br>TINA</a></td>
+    <td align="center"><a href="https://github.com/CursedPrograms/AURA"><img src="https://raw.githubusercontent.com/CursedPrograms/AURA/main/images/avatar_round.png" width="72" alt="AURA"><br>AURA</a></td>
+    <td align="center"><a href="https://github.com/CursedPrograms/FLORA-Robot-v00"><img src="https://raw.githubusercontent.com/CursedPrograms/FLORA-Robot-v00/main/images/avatar_round.png" width="72" alt="FLORA"><br>FLORA</a></td>
   </tr>
 </table>
 
 ---
 
 ## Overview
+
+**Website: <https://cursedprograms.github.io/IDA-Robot-v00/>**
 
 IDA is MILA's little sibling: the same tank chassis cut down to a plain Arduino, an ultrasonic sensor on a servo, an IR receiver and an L298N. There is no WiFi or Bluetooth. Everything is driven from an IR remote, or by [NORA](https://github.com/CursedPrograms/NORA-Robot-v00) over the IR link below.
 
@@ -104,14 +109,12 @@ IDA is MILA's little sibling: the same tank chassis cut down to a plain Arduino,
 - IR Receiver + IR Remote (the same remote as MILA)
 - Buzzer
 
----
-
-## Pinouts
+### Pinout
 
 <details>
 <summary><b>Arduino pin assignments</b></summary>
 
-### Sensors, Servo & Buzzer
+#### Sensors, Servo & Buzzer
 
 | Signal | Pin |
 |---|---|
@@ -121,7 +124,7 @@ IDA is MILA's little sibling: the same tank chassis cut down to a plain Arduino,
 | IR Receiver | 11 |
 | Buzzer | A0 |
 
-### L298N
+#### L298N
 
 | Signal | Pin | |
 |---|---|---|
@@ -219,14 +222,6 @@ These values are at the top of `IDA.ino`. Edit them and re-upload over USB.
 
 ---
 
-<div align="center">&copy; Cursed Entertainment 2026</div>
-
-<div align="center">
-  <a href="https://cursed-entertainment.itch.io/">
-    <img src="https://github.com/CursedPrograms/cursedentertainment/raw/main/images/logos/logo-wide-grey.png" alt="Cursed Entertainment" width="250"/>
-  </a>
-</div>
-
 <div align="center">
   <a href="https://github.com/SynthWomb">
     <img src="https://github.com/SynthWomb/synth.womb/blob/main/logos/synthwomb07.png?raw=true" alt="SynthWomb" width="200"/>
@@ -236,9 +231,22 @@ These values are at the top of `IDA.ino`. Edit them and re-upload over USB.
 ---
 
 <!-- DREAM-ECOSYSTEM:START -->
+
+---
+
+<div align="center">&copy; Cursed Entertainment 2026</div>
+
+<div align="center">
+  <a href="https://cursed-entertainment.itch.io/">
+    <img src="https://github.com/CursedPrograms/cursedentertainment/raw/main/images/logos/logo-wide-grey.png" alt="Cursed Entertainment" width="250"/>
+  </a>
+</div>
+
+---
+
 ## The DREAM Robotics ecosystem
 
 **Minds** — [DREAM](https://github.com/CursedPrograms/DREAM) companion · [TINA](https://github.com/CursedPrograms/TINA) engineer · [NINA](https://github.com/CursedPrograms/NINA) caretaker · [RIFT](https://github.com/CursedPrograms/RIFT) fleet hub · [LYCEA](https://github.com/CursedPrograms/LYCEA) training school  
-**Robots** — [NORA](https://github.com/CursedPrograms/NORA-Robot-v00) · [MILA](https://github.com/CursedPrograms/MILA-Robot-v00) · [WHIP](https://github.com/CursedPrograms/WHIP-Robot-v00) · [KIDA-00](https://github.com/CursedPrograms/KIDA-Robot-v00) · [KIDA-01](https://github.com/CursedPrograms/KIDA-Robot-v01) · [IDA](https://github.com/CursedPrograms/IDA-Robot-v00) · [ARM](https://github.com/CursedPrograms/ARM-Robot-v01) · [NIKA](https://github.com/CursedPrograms/NIKA-Robot-v00) · [ARIA](https://github.com/CursedPrograms/ARIA-Robot-v00)  
+**Robots** — [NORA](https://github.com/CursedPrograms/NORA-Robot-v00) · [MILA](https://github.com/CursedPrograms/MILA-Robot-v00) · [WHIP](https://github.com/CursedPrograms/WHIP-Robot-v00) · [KIDA-00](https://github.com/CursedPrograms/KIDA-Robot-v00) · [KIDA-01](https://github.com/CursedPrograms/KIDA-Robot-v01) · [IDA](https://github.com/CursedPrograms/IDA-Robot-v00) · [ARM](https://github.com/CursedPrograms/ARM-Robot-v01) · [NIKA](https://github.com/CursedPrograms/NIKA-Robot-v00) · [ARIA](https://github.com/CursedPrograms/ARIA-Robot-v00) · [AURA](https://github.com/CursedPrograms/AURA) weather · [FLORA](https://github.com/CursedPrograms/FLORA-Robot-v00) gardener  
 **Remotes** — [RITA](https://github.com/CursedPrograms/RITA) handheld remote  
 <!-- DREAM-ECOSYSTEM:END -->

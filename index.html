@@ -23,8 +23,8 @@
     <ul>
       <li><a href="#overview">Overview</a></li>
       <li><a href="#hardware">Hardware</a></li>
-      <li><a href="#controls">Controls</a></li>
       <li><a href="#quickstart">Quick start</a></li>
+      <li><a href="#controls">Controls</a></li>
       <li><a href="https://github.com/CursedPrograms/IDA-Robot-v00">GitHub</a></li>
     </ul>
   </div>
@@ -68,7 +68,6 @@
 </header>
 
 <main>
-
 <section id="overview">
   <div class="wrap">
     <h2>Overview</h2>
@@ -174,6 +173,34 @@
   </div>
 </section>
 
+<section id="quickstart">
+  <div class="wrap">
+    <h2>Quick start</h2>
+    <h3 class="title">From USB cable to driving</h3>
+    <p class="muted">You need the <a href="https://docs.arduino.cc/software/ide/">Arduino IDE</a>, the bundled <code>Servo</code> library and <a href="https://github.com/Arduino-IRremote/Arduino-IRremote"><code>IRremote</code></a> v4+ from the Library Manager.</p>
+    <ol class="steps">
+      <li><strong>Check the motors first.</strong> Upload <code>scripts/motor_test/motor_test.ino</code>. It repeats forward, backward, left and right for 1.5&nbsp;s each and prints each step on the Serial Monitor. If a track spins the wrong way, swap that motor's two wires on the L298N (OUT1/OUT2 or OUT3/OUT4) instead of changing the code.</li>
+      <li><strong>Upload <code>scripts/IDA/IDA.ino</code>.</strong> On power-up the servo sweeps left and right, she beeps, then starts in obstacle mode.</li>
+      <li><strong>Take over</strong> with <kbd>2</kbd> or <kbd>3</kbd> on the remote.</li>
+    </ol>
+
+    <h3 class="sub">Tuning</h3>
+    <p class="muted">These values are at the top of <code>IDA.ino</code>. Edit them and re-upload over USB.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Setting</th><th>Default</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">turnTime</td><td>550&nbsp;ms</td><td>About a 180° pivot. Obstacle turns are a random 1/4 to all of this. Increase if her 180 falls short.</td></tr>
+          <tr><td class="mono">stopDist</td><td>35&nbsp;cm</td><td>How close an obstacle straight ahead gets before she stops and scans.</td></tr>
+          <tr><td class="mono">diagStopDist</td><td>35&nbsp;cm</td><td>The same, for the diagonal looks.</td></tr>
+          <tr><td class="mono">backupTime</td><td>250&nbsp;ms</td><td>How long she reverses before scanning (0 turns it off).</td></tr>
+          <tr><td class="mono">guardDist</td><td>15&nbsp;cm</td><td>How close an obstacle gets before the guard stops a manual drive.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
 <section id="controls">
   <div class="wrap">
     <h2>Controls</h2>
@@ -233,34 +260,6 @@
   </div>
 </section>
 
-<section id="quickstart">
-  <div class="wrap">
-    <h2>Quick start</h2>
-    <h3 class="title">From USB cable to driving</h3>
-    <p class="muted">You need the <a href="https://docs.arduino.cc/software/ide/">Arduino IDE</a>, the bundled <code>Servo</code> library and <a href="https://github.com/Arduino-IRremote/Arduino-IRremote"><code>IRremote</code></a> v4+ from the Library Manager.</p>
-    <ol class="steps">
-      <li><strong>Check the motors first.</strong> Upload <code>scripts/motor_test/motor_test.ino</code>. It repeats forward, backward, left and right for 1.5&nbsp;s each and prints each step on the Serial Monitor. If a track spins the wrong way, swap that motor's two wires on the L298N (OUT1/OUT2 or OUT3/OUT4) instead of changing the code.</li>
-      <li><strong>Upload <code>scripts/IDA/IDA.ino</code>.</strong> On power-up the servo sweeps left and right, she beeps, then starts in obstacle mode.</li>
-      <li><strong>Take over</strong> with <kbd>2</kbd> or <kbd>3</kbd> on the remote.</li>
-    </ol>
-
-    <h3 class="sub">Tuning</h3>
-    <p class="muted">These values are at the top of <code>IDA.ino</code>. Edit them and re-upload over USB.</p>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Setting</th><th>Default</th><th>What it does</th></tr></thead>
-        <tbody>
-          <tr><td class="mono">turnTime</td><td>550&nbsp;ms</td><td>About a 180° pivot. Obstacle turns are a random 1/4 to all of this. Increase if her 180 falls short.</td></tr>
-          <tr><td class="mono">stopDist</td><td>35&nbsp;cm</td><td>How close an obstacle straight ahead gets before she stops and scans.</td></tr>
-          <tr><td class="mono">diagStopDist</td><td>35&nbsp;cm</td><td>The same, for the diagonal looks.</td></tr>
-          <tr><td class="mono">backupTime</td><td>250&nbsp;ms</td><td>How long she reverses before scanning (0 turns it off).</td></tr>
-          <tr><td class="mono">guardDist</td><td>15&nbsp;cm</td><td>How close an obstacle gets before the guard stops a manual drive.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
 <section id="windows">
   <div class="wrap">
     <h2>Windows app</h2>
@@ -284,6 +283,8 @@
       <a href="https://github.com/CursedPrograms/RIFT">RIFT</a>
       <a href="https://github.com/CursedPrograms/DREAM">DREAM</a>
       <a href="https://github.com/CursedPrograms/RITA">RITA</a>
+      <a href="https://github.com/CursedPrograms/AURA">AURA</a>
+      <a href="https://github.com/CursedPrograms/FLORA-Robot-v00">FLORA-Robot-v00</a>
     </div>
   </div>
 </section>
@@ -297,7 +298,7 @@
 <section class="eco">
   <div class="eco-title">The DREAM Robotics ecosystem</div>
   <div><strong>Minds</strong> — <a href="https://cursedprograms.github.io/DREAM/">DREAM</a> companion · <a href="https://cursedprograms.github.io/TINA/">TINA</a> engineer · <a href="https://cursedprograms.github.io/NINA/">NINA</a> caretaker · <a href="https://cursedprograms.github.io/RIFT/">RIFT</a> fleet hub · <a href="https://github.com/CursedPrograms/LYCEA">LYCEA</a> training school</div>
-  <div><strong>Robots</strong> — <a href="https://cursedprograms.github.io/NORA-Robot-v00/">NORA</a> · <a href="https://cursedprograms.github.io/MILA-Robot-v00/">MILA</a> · <a href="https://cursedprograms.github.io/WHIP-Robot-v00/">WHIP</a> · <a href="https://cursedprograms.github.io/KIDA-Robot-v00/">KIDA-00</a> · <a href="https://cursedprograms.github.io/KIDA-Robot-v01/">KIDA-01</a> · <a href="https://cursedprograms.github.io/IDA-Robot-v00/">IDA</a> · <a href="https://cursedprograms.github.io/ARM-Robot-v01/">ARM</a> · <a href="https://cursedprograms.github.io/NIKA-Robot-v00/">NIKA</a> · <a href="https://cursedprograms.github.io/ARIA-Robot-v00/">ARIA</a></div>
+  <div><strong>Robots</strong> — <a href="https://cursedprograms.github.io/NORA-Robot-v00/">NORA</a> · <a href="https://cursedprograms.github.io/MILA-Robot-v00/">MILA</a> · <a href="https://cursedprograms.github.io/WHIP-Robot-v00/">WHIP</a> · <a href="https://cursedprograms.github.io/KIDA-Robot-v00/">KIDA-00</a> · <a href="https://cursedprograms.github.io/KIDA-Robot-v01/">KIDA-01</a> · <a href="https://cursedprograms.github.io/IDA-Robot-v00/">IDA</a> · <a href="https://cursedprograms.github.io/ARM-Robot-v01/">ARM</a> · <a href="https://cursedprograms.github.io/NIKA-Robot-v00/">NIKA</a> · <a href="https://cursedprograms.github.io/ARIA-Robot-v00/">ARIA</a> · <a href="https://cursedprograms.github.io/AURA/">AURA</a> weather · <a href="https://cursedprograms.github.io/FLORA-Robot-v00/">FLORA</a> gardener</div>
   <div><strong>Remotes</strong> — <a href="https://cursedprograms.github.io/RITA/">RITA</a> handheld remote</div>
 </section>
 <!-- DREAM-ECOSYSTEM:END -->
